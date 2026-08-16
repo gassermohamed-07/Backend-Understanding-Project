@@ -4,6 +4,7 @@ import  auth  from "../middlewares/auth.middleware.js";
 import requireRole from "../middlewares/permission.middleware.js";
 import { createBoard, deleteBoard, getBoard, listBoards, updateBoard } from "../controllers/board.controller.js";
 import { createTask, listTasks, getTask, updateTask, deleteTask } from "../controllers/task.controller.js";
+import { sendInvite } from "../controllers/invites.controller.js";
 
 const workspaceRouter = Router();
 
@@ -14,6 +15,7 @@ workspaceRouter.get("/", auth, listWorkspaces)
 workspaceRouter.get("/:workspaceId", auth, requireRole(["owner", "member", "admin"]), getWorkspace);
 workspaceRouter.patch("/:workspaceId", auth, requireRole(["owner", "admin"]), updateWorkspace);
 workspaceRouter.delete("/:workspaceId", auth, requireRole(["owner", "admin"]), deleteWorkspace);
+workspaceRouter.post("/:workspaceId/invites", auth, requireRole(["owner", "admin"]), sendInvite);
 
 //Boards Routes
 workspaceRouter.post("/:workspaceId/boards", auth, requireRole(["owner", "member", "admin"]), createBoard);
