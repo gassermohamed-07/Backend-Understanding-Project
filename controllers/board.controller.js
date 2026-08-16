@@ -77,10 +77,36 @@ const updateBoard = async (req, res, next) => {
   }
 }
 
+const deleteBoard = async (req, res, next) =>{
+  try {
+    const findBoard = await Board.findById(req.params.boardId);
+    if (!findBoard) {
+      const error = new Error("Board not found!");
+      error.statuscode = 404;
+      throw error;
+    }
+
+    const workspace = req.membership.workspace
+
+    if (findBoard.workspace.toString() !== workspace.toString()) {
+      const error = new Error("You are not a member of this workspace!");
+      error.statuscode = 403;
+      throw error;
+    }
+
+    await findBoard.deleteOne();
+    res.status(200).json({message: "Board deleted successfully"})
+
+  } catch (error) {
+    next(error)
+  }
+}
+
 export {
 
   createBoard,
   listBoards,
   getBoard,
-  updateBoard
+  updateBoard,
+  deleteBoard
 }

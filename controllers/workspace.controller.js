@@ -65,21 +65,27 @@ const updateWorkspace = async (req, res, next) => {
   }
 }
 
-const deleteWokspace = async (req, res, next) =>{
+const deleteWorkspace = async (req, res, next) =>{
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const workspaceId = req.params.workspaceId;
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      const error = new Error("Workspace not found!");
+      error.statuscode = 404;
+      throw error;
+    }
     await Board.deleteMany({workspace: workspaceId}, {session});
     await User.updateMany({"workspaces.workspace": workspaceId}, {$pull: {workspaces: {workspace: workspaceId}}}, {session});
-    await Workspace.findByIdAndDelete(workspaceId, {session});
-    session.commitTransaction();
-    res.status(204).json({message: "Workspace deleted successfully"})
+    await workspace.deleteOne({session});
+    await session.commitTransaction();
+    res.status(200).json({message: "Workspace deleted successfully"})
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     next(error);
   } finally{
-    session.endSession();
+    await session.endSession();
    ;
   }
 }
@@ -92,5 +98,5 @@ export {
   listWorkspaces,
   getWorkspace,
   updateWorkspace,
-  deleteWokspace
+  deleteWorkspace
 }
