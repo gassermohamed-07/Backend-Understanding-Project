@@ -5,6 +5,7 @@ import requireRole from "../middlewares/permission.middleware.js";
 import { createBoard, deleteBoard, getBoard, listBoards, updateBoard } from "../controllers/board.controller.js";
 import { createTask, listTasks, getTask, updateTask, deleteTask } from "../controllers/task.controller.js";
 import { sendInvite } from "../controllers/invites.controller.js";
+import { createComment, deleteComment, listComments } from "../controllers/comment.controller.js";
 
 const workspaceRouter = Router();
 
@@ -15,7 +16,9 @@ workspaceRouter.get("/", auth, listWorkspaces)
 workspaceRouter.get("/:workspaceId", auth, requireRole(["owner", "member", "admin"]), getWorkspace);
 workspaceRouter.patch("/:workspaceId", auth, requireRole(["owner", "admin"]), updateWorkspace);
 workspaceRouter.delete("/:workspaceId", auth, requireRole(["owner", "admin"]), deleteWorkspace);
-workspaceRouter.post("/:workspaceId/invites", auth, requireRole(["owner", "admin"]), sendInvite);
+
+//Invites Routes
+workspaceRouter.post("/:workspaceId/invite", auth, requireRole(["owner", "admin"]), sendInvite);
 
 //Boards Routes
 workspaceRouter.post("/:workspaceId/boards", auth, requireRole(["owner", "member", "admin"]), createBoard);
@@ -31,5 +34,10 @@ workspaceRouter.get("/:workspaceId/boards/:boardId/tasks", auth, requireRole(["o
 workspaceRouter.get("/:workspaceId/boards/:boardId/tasks/:taskId", auth, requireRole(["owner", "member", "admin"]), getTask);
 workspaceRouter.patch("/:workspaceId/boards/:boardId/tasks/:taskId", auth, requireRole(["owner", "member", "admin"]), updateTask);
 workspaceRouter.delete("/:workspaceId/boards/:boardId/tasks/:taskId", auth, requireRole(["owner", "admin"]), deleteTask);
+
+// Comments Routes
+workspaceRouter.post("/:workspaceId/boards/:boardId/tasks/:taskId/comments", auth, requireRole(["owner", "member", "admin"]), createComment);
+workspaceRouter.get("/:workspaceId/boards/:boardId/tasks/:taskId/comments", auth, requireRole(["owner", "member", "admin"]), listComments);
+workspaceRouter.delete("/:workspaceId/boards/:boardId/tasks/:taskId/comments/:commentId", auth, requireRole(["owner", "member", "admin"]), deleteComment);
 
 export default workspaceRouter;
